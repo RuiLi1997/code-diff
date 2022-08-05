@@ -26,20 +26,15 @@ public class VersionControlDto {
     private String repoUrl;
 
     /**
-     * git原始分支或tag/svn 版本
+     * git原始分支或tag版本
      */
     private String baseVersion;
 
     /**
-     * git现分支或tag、svn 版本
+     * git现分支或tag版本
      */
     private String nowVersion;
 
-
-    /**
-     * 专用于svn新分支
-     */
-    private String svnRepoUrl;
 
 
     /**

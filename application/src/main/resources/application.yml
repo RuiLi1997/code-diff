@@ -25,18 +25,13 @@ swagger:
 #  unauthorizedUrl: /view/sys/unauthorized
 #  sessionManager:
 #    sessionIdUrlRewritingEnabled: false
+#参数化
 git:
-  userName: rayduan
-  password: dsfsdf2323
+  userName: PRIVATE-TOKEN
+  password: iu1bDkQ-in8g7q334oYL
   local:
     base:
-      dir: D:\git-test
-svn:
-  userName: admin
-  password: 123456
-  local:
-    base:
-      dir: D:\svn-test
+      dir: /Users/liruilr/jacoco/increment_code/git_project
 server:
   port: 8085
   servlet:

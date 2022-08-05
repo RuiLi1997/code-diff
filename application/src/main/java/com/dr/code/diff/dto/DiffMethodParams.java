@@ -34,12 +34,6 @@ public class DiffMethodParams {
      */
     private String nowVersion = "";
 
-
-    /**
-     * 专用于svn新分支
-     */
-    private String svnRepoUrl;
-
     /**
      * 版本控制类型
      */

@@ -18,7 +18,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class CustomizeConfig {
 
-
     /**
      * git账号
      */
@@ -37,20 +36,4 @@ public class CustomizeConfig {
     private String gitLocalBaseRepoDir;
 
 
-    /**
-     * git账号
-     */
-    @Value(value = "${svn.userName}")
-    private String svnUserName;
-    /**
-     * git密码
-     */
-    @Value(value = "${svn.password}")
-    private String svnPassWord;
-
-    /**
-     * git下载代码到本地的根目录
-     */
-    @Value(value = "${svn.local.base.dir}")
-    private String svnLocalBaseRepoDir;
 }
