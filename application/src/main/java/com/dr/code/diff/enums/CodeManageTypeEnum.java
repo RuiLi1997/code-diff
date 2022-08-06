@@ -14,9 +14,9 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum CodeManageTypeEnum {
     //待通知
-    GIT(0,"git"),
+    GIT(0,"git");
 
-    SVN(1,"svn"),;
+    // SVN(1,"svn"),;
 
     private Integer code;
     private String value;

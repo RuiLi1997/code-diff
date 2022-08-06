@@ -20,32 +20,19 @@ import java.util.List;
 @Data
 public class VersionControlDto {
 
-    /**
-     *  远程仓库地址
-     */
-    private String repoUrl;
 
     /**
-     * git原始分支或tag版本
+     *  本地仓库地址
      */
-    private String baseVersion;
+    private String RepoPath;
+
 
     /**
      * git现分支或tag版本
+     * old commit 假如没有就默认最近两个版本
      */
-    private String nowVersion;
+    private String oldVersion;
 
-
-
-    /**
-     * 本地旧文件基础地址
-     */
-    private String oldLocalBasePath;
-
-    /**
-     * 本地新文件基础地址
-     */
-    private String newLocalBasePath;
 
     /**
      * 版本控制类型

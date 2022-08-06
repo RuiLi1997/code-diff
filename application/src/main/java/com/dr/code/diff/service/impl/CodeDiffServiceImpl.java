@@ -1,6 +1,7 @@
 package com.dr.code.diff.service.impl;
 
 import com.dr.code.diff.dto.ClassInfoResult;
+import com.dr.code.diff.dto.DiffEntryDto;
 import com.dr.code.diff.dto.DiffMethodParams;
 import com.dr.code.diff.dto.VersionControlDto;
 import com.dr.code.diff.service.CodeDiffService;
@@ -33,7 +34,7 @@ public class CodeDiffServiceImpl implements CodeDiffService {
      * @description: 获取差异代码
      */
     @Override
-    public List<ClassInfoResult> getDiffCode(DiffMethodParams diffMethodParams) {
+    public List<DiffEntryDto> getDiffCode(DiffMethodParams diffMethodParams) {
         VersionControlDto dto = OrikaMapperUtils.map(diffMethodParams, VersionControlDto.class);
         return VersionControlHandlerFactory.processHandler(dto);
     }

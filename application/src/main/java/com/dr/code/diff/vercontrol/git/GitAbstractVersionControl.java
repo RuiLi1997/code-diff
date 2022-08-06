@@ -20,13 +20,16 @@ import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.diff.DiffFormatter;
 import org.eclipse.jgit.diff.Edit;
 import org.eclipse.jgit.diff.EditList;
+import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.patch.FileHeader;
 import org.eclipse.jgit.patch.HunkHeader;
+import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.treewalk.AbstractTreeIterator;
 import org.eclipse.jgit.util.io.DisabledOutputStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.eclipse.jgit.revwalk.RevWalk;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -35,6 +38,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static com.dr.code.diff.util.GitRepoUtil.getGit;
 
 /**
  * @ProjectName: code-diff-parent
@@ -65,26 +70,37 @@ public class GitAbstractVersionControl extends AbstractVersionControl {
     @Override
     public void getDiffCodeClasses() {
         try {
-            String localBaseRepoDir = GitRepoUtil.getLocalDir(super.versionControlDto.getRepoUrl(), customizeConfig.getGitLocalBaseRepoDir(), super.versionControlDto.getBaseVersion());
-            String localNowRepoDir = GitRepoUtil.getLocalDir(super.versionControlDto.getRepoUrl(), customizeConfig.getGitLocalBaseRepoDir(), super.versionControlDto.getNowVersion());
-            super.versionControlDto.setNewLocalBasePath(localNowRepoDir);
-            super.versionControlDto.setOldLocalBasePath(localBaseRepoDir);
-            //原有代码git对象
-            Git baseGit = GitRepoUtil.cloneRepository(super.versionControlDto.getRepoUrl(), localBaseRepoDir, super.versionControlDto.getBaseVersion(), customizeConfig.getGitUserName(), customizeConfig.getGitPassWord());
-            //现有代码git对象
-            Git nowGit = GitRepoUtil.cloneRepository(super.versionControlDto.getRepoUrl(), localNowRepoDir, super.versionControlDto.getNowVersion(), customizeConfig.getGitUserName(), customizeConfig.getGitPassWord());
-            AbstractTreeIterator baseTree = GitRepoUtil.prepareTreeParser(baseGit.getRepository(), super.versionControlDto.getBaseVersion());
-            AbstractTreeIterator nowTree = GitRepoUtil.prepareTreeParser(nowGit.getRepository(), super.versionControlDto.getNowVersion());
+            Git git = getGit(super.versionControlDto.getRepoPath());
+            Repository repository = git.getRepository();
+            List<RevCommit> commitList = new ArrayList<>();
+            Iterable<RevCommit> commits = git.log().setMaxCount(2).call();
+            AbstractTreeIterator baseTree;
+            AbstractTreeIterator nowTree;
+            for(RevCommit commit:commits){
+                commitList.add(commit);
+            }
+            if(super.versionControlDto.getOldVersion().equals("empty")) {
+                // 假如没有old version的id，默认最近两个版本的差异
+                // 获取上一个版本的数据
+                baseTree = GitRepoUtil.prepareTreeParserByRevCommit(repository, commitList.get(1));
+            } else {
+                // 获取目标commit的数据
+                baseTree = GitRepoUtil.prepareTreeParserByStringId(repository, super.versionControlDto.getOldVersion());
+            }
+
+            // 默认是最新版本的(容器内运行版本)
+           nowTree = GitRepoUtil.prepareTreeParserByRevCommit(repository, commitList.get(0));
+
             //获取两个版本之间的差异代码
             List<DiffEntry> diff = null;
-            diff = nowGit.diff().setOldTree(baseTree).setNewTree(nowTree).setShowNameAndStatusOnly(true).call();
+            diff = git.diff().setOldTree(baseTree).setNewTree(nowTree).setShowNameAndStatusOnly(true).call();
             //过滤出有效的差异代码
             Collection<DiffEntry> validDiffList = diff.stream()
-                    //只计算java文件
+                    // 只计算java文件
                     .filter(e -> e.getNewPath().endsWith(".java"))
-                    //排除测试文件
+                    // 排除测试文件
                     .filter(e -> e.getNewPath().contains("src/main/java"))
-                    //只计算新增和变更文件
+                    // 只计算新增和变更文件
                     .filter(e -> DiffEntry.ChangeType.ADD.equals(e.getChangeType()) || DiffEntry.ChangeType.MODIFY.equals(e.getChangeType()))
                     .collect(Collectors.toList());
 
@@ -97,7 +113,7 @@ public class GitAbstractVersionControl extends AbstractVersionControl {
             Map<String, DiffEntryDto> diffMap = diffEntries.stream().collect(Collectors.toMap(DiffEntryDto::getNewPath, Function.identity()));
             LoggerUtil.info(log, "需要对比的差异类为：", JSON.toJSON(diffEntries));
             DiffFormatter diffFormatter = new DiffFormatter(DisabledOutputStream.INSTANCE);
-            diffFormatter.setRepository(nowGit.getRepository());
+            diffFormatter.setRepository(git.getRepository());
             diffFormatter.setContext(0);
             //此处是获取变更行，有群友需求新增行或变更行要在类中打标记，此处忽略删除行
             for (DiffEntry diffClass : validDiffList) {
@@ -128,30 +144,5 @@ public class GitAbstractVersionControl extends AbstractVersionControl {
             throw new BizException(BizCode.GET_DIFF_CLASS_ERROR);
         }
 
-    }
-
-
-    /**
-     * @param filePackage
-     * @date:2021/4/24
-     * @className:VersionControl
-     * @author:Administrator
-     * @description: 获取旧版本文件本地路径
-     */
-    @Override
-    public String getLocalNewPath(String filePackage) {
-        return PathUtils.getClassFilePath(super.versionControlDto.getNewLocalBasePath(), filePackage);
-    }
-
-    /**
-     * @param filePackage
-     * @date:2021/4/24
-     * @className:VersionControl
-     * @author:Administrator
-     * @description: 获取新版本文件本地路径
-     */
-    @Override
-    public String getLocalOldPath(String filePackage) {
-        return PathUtils.getClassFilePath(super.versionControlDto.getOldLocalBasePath(), filePackage);
     }
 }

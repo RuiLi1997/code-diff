@@ -1,6 +1,7 @@
 package com.dr.code.diff.vercontrol;
 
 import com.dr.code.diff.dto.ClassInfoResult;
+import com.dr.code.diff.dto.DiffEntryDto;
 import com.dr.code.diff.dto.VersionControlDto;
 import com.google.common.collect.Lists;
 import org.springframework.beans.BeansException;
@@ -49,8 +50,8 @@ public class VersionControlHandlerFactory implements CommandLineRunner, Applicat
      * 执行方法校验
      * @param versionControlDto
      */
-    public static List<ClassInfoResult> processHandler(VersionControlDto versionControlDto) {
-        List<ClassInfoResult> result = null;
+    public static List<DiffEntryDto> processHandler(VersionControlDto versionControlDto) {
+        List<DiffEntryDto> result = null;
         for (int i = 0; i < handlers.size(); i++) {
             if(versionControlDto.getCodeManageTypeEnum().equals(handlers.get(i).getType())){
                 result = handlers.get(i).handler(versionControlDto);

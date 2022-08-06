@@ -20,19 +20,16 @@ public class DiffMethodParams {
 
 
     /**
-     * git 远程仓库地址
+     * git 本地仓库地址
      */
-    private String repoUrl;
+    private String repoPath;
 
     /**
-     * git原始分支或tag
+     * git现分支或tag版本
+     * old commit 假如没有就默认最近两个版本
      */
-    private String baseVersion = "";
+    private String oldVersion;
 
-    /**
-     * git现分支或tag
-     */
-    private String nowVersion = "";
 
     /**
      * 版本控制类型

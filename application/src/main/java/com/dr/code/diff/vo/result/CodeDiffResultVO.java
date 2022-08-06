@@ -4,6 +4,7 @@ import com.dr.code.diff.dto.ChangeLine;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.eclipse.jgit.diff.DiffEntry;
 
 import java.util.List;
 
@@ -18,31 +19,18 @@ import java.util.List;
 public class CodeDiffResultVO {
 
 
+    /**
+     * 文件包名
+     */
+    @ApiModelProperty(name = "newPath", value = "变更行信息")
+    protected String newPath;
 
     /**
-     * 模块名称
+     * 文件变更类型
      */
-    @ApiModelProperty(name = "moduleName", value = "模块名,请把模块名和目录保持一致", dataType = "String", example = "common")
-    private String moduleName;
+    @ApiModelProperty(name = "lines", value = "变更行信息")
+    private DiffEntry.ChangeType changeType;
 
-    /**
-     * java文件
-     */
-    @ApiModelProperty(name = "classFile", value = "java文件", dataType = "String", example = "com/dr/code/diff/controller/A.java")
-    private String classFile;
-
-    /**
-     * 类中的方法
-     */
-    @ApiModelProperty(name = "methodInfos", value = "类中的方法")
-    private List<MethodInfoResultVO> methodInfos;
-
-
-    /**
-     * 修改类型
-     */
-    @ApiModelProperty(name = "type", value = "修改类型", dataType = "String", example = "ADD")
-    private String type;
 
     /**
      * 变更行

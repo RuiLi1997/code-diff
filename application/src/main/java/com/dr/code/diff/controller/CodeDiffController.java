@@ -2,7 +2,7 @@ package com.dr.code.diff.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.dr.code.diff.dto.ClassInfoResult;
+import com.dr.code.diff.dto.DiffEntryDto;
 import com.dr.code.diff.dto.DiffMethodParams;
 import com.dr.code.diff.enums.CodeManageTypeEnum;
 import com.dr.code.diff.service.CodeDiffService;
@@ -39,20 +39,17 @@ public class CodeDiffController {
     @ApiOperation("git获取差异代码")
     @RequestMapping(value = "git/list", method = RequestMethod.GET)
     public UniqueApoResponse<List<CodeDiffResultVO>> getGitList(
-            @ApiParam(required = true, name = "gitUrl", value = "git远程仓库地址")
-            @RequestParam(value = "gitUrl") String gitUrl,
-            @ApiParam(required = true, name = "baseVersion", value = "git原始分支或tag")
-            @RequestParam(value = "baseVersion") String baseVersion,
-            @ApiParam(required = true, name = "nowVersion", value = "git现分支或tag")
-            @RequestParam(value = "nowVersion") String nowVersion) {
+            @ApiParam(required = true, name = "gitPath", value = "git本地地址")
+            @RequestParam(value = "gitPath") String gitPath,
+            @ApiParam(name = "oldVersion", value = "计算增量代码所需要的对比地址")
+            @RequestParam(value = "oldVersion", defaultValue = "empty") String oldVersion){
         DiffMethodParams diffMethodParams = DiffMethodParams.builder()
-                .repoUrl(StringUtils.trim(gitUrl))
-                .baseVersion(StringUtils.trim(baseVersion))
-                .nowVersion(StringUtils.trim(nowVersion))
+                .repoPath(StringUtils.trim(gitPath))
+                .oldVersion(StringUtils.trim(oldVersion))
                 .codeManageTypeEnum(CodeManageTypeEnum.GIT)
                 .build();
-        List<ClassInfoResult> diffCodeList = codeDiffService.getDiffCode(diffMethodParams);
-        List<CodeDiffResultVO> list = OrikaMapperUtils.mapList(diffCodeList, ClassInfoResult.class, CodeDiffResultVO.class);
+        List<DiffEntryDto> diffCodeList = codeDiffService.getDiffCode(diffMethodParams);
+        List<CodeDiffResultVO> list = OrikaMapperUtils.mapList(diffCodeList, DiffEntryDto.class, CodeDiffResultVO.class);
         return new UniqueApoResponse<List<CodeDiffResultVO>>().success(list, JSON.toJSONString(list,SerializerFeature.WriteNullListAsEmpty));
     }
 
