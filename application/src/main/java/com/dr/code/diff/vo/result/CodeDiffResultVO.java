@@ -20,17 +20,29 @@ public class CodeDiffResultVO {
 
 
     /**
-     * 文件包名
+     * 模块名称
      */
-    @ApiModelProperty(name = "newPath", value = "变更行信息")
-    protected String newPath;
+    @ApiModelProperty(name = "moduleName", value = "模块名,请把模块名和目录保持一致", dataType = "String", example = "common")
+    private String moduleName;
 
     /**
-     * 文件变更类型
+     * java文件
      */
-    @ApiModelProperty(name = "lines", value = "变更行信息")
-    private DiffEntry.ChangeType changeType;
+    @ApiModelProperty(name = "classFile", value = "java文件", dataType = "String", example = "com/dr/code/diff/controller/A.java")
+    private String classFile;
 
+    /**
+     * 类中的方法
+     */
+    @ApiModelProperty(name = "methodInfos", value = "类中的方法")
+    private List<MethodInfoResultVO> methodInfos;
+
+
+    /**
+     * 修改类型
+     */
+    @ApiModelProperty(name = "type", value = "修改类型", dataType = "String", example = "ADD")
+    private String type;
 
     /**
      * 变更行

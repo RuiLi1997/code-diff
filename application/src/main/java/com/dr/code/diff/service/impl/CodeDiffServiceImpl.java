@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @ProjectName: base-service
@@ -34,8 +35,9 @@ public class CodeDiffServiceImpl implements CodeDiffService {
      * @description: 获取差异代码
      */
     @Override
-    public List<DiffEntryDto> getDiffCode(DiffMethodParams diffMethodParams) {
+    public List<ClassInfoResult> getDiffCode(DiffMethodParams diffMethodParams) {
         VersionControlDto dto = OrikaMapperUtils.map(diffMethodParams, VersionControlDto.class);
         return VersionControlHandlerFactory.processHandler(dto);
     }
+
 }

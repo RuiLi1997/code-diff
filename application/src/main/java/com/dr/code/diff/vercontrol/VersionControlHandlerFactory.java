@@ -50,8 +50,8 @@ public class VersionControlHandlerFactory implements CommandLineRunner, Applicat
      * 执行方法校验
      * @param versionControlDto
      */
-    public static List<DiffEntryDto> processHandler(VersionControlDto versionControlDto) {
-        List<DiffEntryDto> result = null;
+    public static List<ClassInfoResult> processHandler(VersionControlDto versionControlDto) {
+        List<ClassInfoResult> result = null;
         for (int i = 0; i < handlers.size(); i++) {
             if(versionControlDto.getCodeManageTypeEnum().equals(handlers.get(i).getType())){
                 result = handlers.get(i).handler(versionControlDto);

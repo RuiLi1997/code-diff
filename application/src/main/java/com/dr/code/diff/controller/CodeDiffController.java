@@ -2,10 +2,12 @@ package com.dr.code.diff.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.dr.code.diff.dto.ClassInfoResult;
 import com.dr.code.diff.dto.DiffEntryDto;
 import com.dr.code.diff.dto.DiffMethodParams;
 import com.dr.code.diff.enums.CodeManageTypeEnum;
 import com.dr.code.diff.service.CodeDiffService;
+import com.dr.code.diff.service.CommitInfoService;
 import com.dr.code.diff.vo.result.CodeDiffResultVO;
 import com.dr.common.response.UniqueApoResponse;
 import com.dr.common.utils.mapper.OrikaMapperUtils;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author rui.duan
@@ -36,8 +39,11 @@ public class CodeDiffController {
     @Autowired
     private CodeDiffService codeDiffService;
 
+    @Autowired
+    private CommitInfoService commitInfoService;
+
     @ApiOperation("git获取差异代码")
-    @RequestMapping(value = "git/list", method = RequestMethod.GET)
+    @RequestMapping(value = "diff-info", method = RequestMethod.GET)
     public UniqueApoResponse<List<CodeDiffResultVO>> getGitList(
             @ApiParam(required = true, name = "gitPath", value = "git本地地址")
             @RequestParam(value = "gitPath") String gitPath,
@@ -48,9 +54,17 @@ public class CodeDiffController {
                 .oldVersion(StringUtils.trim(oldVersion))
                 .codeManageTypeEnum(CodeManageTypeEnum.GIT)
                 .build();
-        List<DiffEntryDto> diffCodeList = codeDiffService.getDiffCode(diffMethodParams);
-        List<CodeDiffResultVO> list = OrikaMapperUtils.mapList(diffCodeList, DiffEntryDto.class, CodeDiffResultVO.class);
+        List<ClassInfoResult> diffCodeList = codeDiffService.getDiffCode(diffMethodParams);
+        List<CodeDiffResultVO> list = OrikaMapperUtils.mapList(diffCodeList,ClassInfoResult.class, CodeDiffResultVO.class);
         return new UniqueApoResponse<List<CodeDiffResultVO>>().success(list, JSON.toJSONString(list,SerializerFeature.WriteNullListAsEmpty));
+    }
+
+    @ApiOperation("git获取版本信息")
+    @RequestMapping(value = "commit-id", method = RequestMethod.GET)
+    public Map<String, String> commitInfo(
+            @ApiParam(required = true, name = "gitPath", value = "git本地地址")
+            @RequestParam(value = "gitPath") String gitPath){
+        return commitInfoService.getCommitInfo(gitPath);
     }
 
 }

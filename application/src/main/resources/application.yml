@@ -27,11 +27,11 @@ swagger:
 #    sessionIdUrlRewritingEnabled: false
 #参数化
 git:
-  userName: PRIVATE-TOKEN
-  password: iu1bDkQ-in8g7q334oYL
+  userName: test
+  password: test
   local:
     base:
-      dir: /Users/liruilr/jacoco/increment_code/git_project
+      dir: test
 server:
   port: 8085
   servlet:

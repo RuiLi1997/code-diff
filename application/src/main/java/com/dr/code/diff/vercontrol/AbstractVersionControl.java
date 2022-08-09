@@ -45,12 +45,13 @@ public abstract class AbstractVersionControl {
 
     /**
      * 执行handler
+     *
      * @return
      */
-    public List<DiffEntryDto> handler(VersionControlDto versionControlDto) {
+    public List<ClassInfoResult> handler(VersionControlDto versionControlDto) {
         this.versionControlDto = versionControlDto;
         getDiffCodeClasses();
-        return versionControlDto.getDiffClasses();
+        return getDiffCodeMethods();
     }
 
     public abstract void getDiffCodeClasses();
@@ -61,7 +62,34 @@ public abstract class AbstractVersionControl {
     public abstract CodeManageTypeEnum getType();
 
 
+    public List<ClassInfoResult> getDiffCodeMethods() {
+        if(CollectionUtils.isEmpty(versionControlDto.getDiffClasses())){
+            return null;
+        }
+        LoggerUtil.info(log,"需要对比的差异类数",versionControlDto.getDiffClasses().size());
+        List<CompletableFuture<ClassInfoResult>> priceFuture = versionControlDto.getDiffClasses().stream()
+                .map(this::getClassMethods)
+                .collect(Collectors.toList());
+        CompletableFuture.allOf(priceFuture.toArray(new CompletableFuture[0])).join();
+        List<ClassInfoResult> list = priceFuture.stream().map(CompletableFuture::join).filter(Objects::nonNull).collect(Collectors.toList());
+        if(!CollectionUtils.isEmpty(list)){
+            LoggerUtil.info(log,"计算出最终差异类数",list.size());
+        }
+        return list;
+    }
 
-
+    private CompletableFuture<ClassInfoResult> getClassMethods(DiffEntryDto diffEntry) {
+        return CompletableFuture.supplyAsync(() -> {
+            String className = diffEntry.getNewPath().split("\\.")[0].split("src/main/java/")[1];
+            String moduleName = diffEntry.getNewPath().split("/")[0];
+            //新增类和修改类
+            return ClassInfoResult.builder()
+                    .classFile(className)
+                    .type(DiffEntry.ChangeType.ADD.name())
+                    .moduleName(moduleName)
+                    .lines(diffEntry.getLines())
+                    .build();
+        }, executor);
+    }
 
 }

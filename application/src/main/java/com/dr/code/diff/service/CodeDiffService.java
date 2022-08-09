@@ -5,6 +5,7 @@ import com.dr.code.diff.dto.DiffEntryDto;
 import com.dr.code.diff.dto.DiffMethodParams;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @ProjectName: base-service
@@ -25,7 +26,8 @@ public interface CodeDiffService {
      * @author:Administrator
      * @description: 获取差异代码
      */
-    List<DiffEntryDto> getDiffCode(DiffMethodParams diffMethodParams);
+    List<ClassInfoResult> getDiffCode(DiffMethodParams diffMethodParams);
+
 
 
 }
